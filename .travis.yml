@@ -8,27 +8,35 @@ stages:
 
 notifications:
   email: false
+  
+node_js: 10.15.3
 
-node_js:
-  - 10.15.3
-  - 8.9.0
+cache: npm
 
-matrix:
+jobs:
   include:
     - stage: lint
-      node_js: 10.15.3
       script:
         - npm run lint
        
-    - stage: build
+    - &build
+      stage: build
       script:
         - npm run build
+    - <<: *build
+      node_js: 8.9.0
     
-    - stage: test
+    - &test-unit
+      stage: test
+      name: 'Unit Tests'
       script:
         - npm run test:unit
+    - <<: *test-unit
+      node_js: 8.9.0
 
-    - stage: test
+    - &test-integration
+      stage: test
+      name: 'Integration Tests'
       before_script:
         ## Spin up container
         - cd test/docker/
@@ -44,8 +52,9 @@ matrix:
         - echo $PERSONAL_ACCESS_TOKEN
       script:
         - npm run test:integration
+    - <<: test-integration
+      node_js: 8.9.0
 
     - stage: release
-      node_js: 10.15.3
       script:
         - npm run release

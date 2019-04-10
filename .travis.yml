@@ -13,7 +13,7 @@ node_js:
   - 10.15.3
   - 8.9.0
 
-jobs:
+matrix:
   include:
     - stage: lint
       node_js: 10.15.3
@@ -25,12 +25,10 @@ jobs:
         - npm run build
     
     - stage: test
-      name: 'Unit Tests'
       script:
         - npm run test:unit
 
     - stage: test
-      name: 'Integration Tests'
       before_script:
         ## Spin up container
         - cd test/docker/
